@@ -39,6 +39,7 @@ yarn start
 
 5. **Iniciar o Servidor Frontend 
    Em outro terminal, vá para o diretório do frontend:
+ ```
 Frontend: 
 cd C:\pasta que esta o projeto\Contatos\frontend
  
@@ -51,6 +52,6 @@ yarn start
 
    ```
 
-   ```
+
 6. **Acessar o Aplicativo:**
   Acesse `http://localhost:3000/`
