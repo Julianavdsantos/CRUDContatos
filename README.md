@@ -24,7 +24,7 @@
 yarn sequelize-cli db:migrate
 
    ```
- yarn sequelize-cli db:migrate
+ 
 
 
    ```
@@ -33,11 +33,12 @@ Backend :
 cd C:\pasta que esta o projeto\Contatos\api
 yarn start
 
-5. **Iniciar o Servidor Frontend e backend 
+5. **Iniciar o Servidor Frontend 
    Em outro terminal, vá para o diretório do frontend:
-   ```
 Frontend: 
 cd C:\pasta que esta o projeto\Contatos\frontend
+   ```
+
 
    ```
 6. **Acessar o Aplicativo:**
