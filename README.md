@@ -19,8 +19,13 @@
 
 4. **Executar Migrações do Banco de Dados:**
    Se estiver usando migrações (como com `sequelize-cli`), execute:
+
+   
+yarn sequelize-cli db:migrate
+
    ```
-  yarn sequelize-cli db:migrate
+ yarn sequelize-cli db:migrate
+
 
    ```
 5-Iniciar o Servidor Backend:
