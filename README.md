@@ -40,11 +40,9 @@ yarn start
 5. **Iniciar o Servidor Frontend 
    Em outro terminal, vá para o diretório do frontend:
  ```
-Frontend: 
-cd C:\pasta que esta o projeto\Contatos\frontend
- 
 
-     ```
+
+     
 
 Frontend: 
 cd C:\pasta que esta o projeto\Contatos\frontend
