@@ -1,97 +1,149 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import ReactPaginate from 'react-paginate';
 
-const Table = styled.table`
-  width: 100%;
-  background-color: #fff;
-  padding: 20px;
-  box-shadow: 0px 0px 5px #ccc;
+const InputArea = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+
+
+const Input = styled.input`
+  width: 120px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
   border-radius: 5px;
-  max-width: 1120px;
-  margin: 20px auto;
-  word-break: break-all;
+  height: 40px;
 `;
 
-export const Thead = styled.thead``;
-
-export const Tbody = styled.tbody``;
-
-export const Tr = styled.tr``;
-
-export const Th = styled.th`
-  text-align: start;
-  border-bottom: inset;
-  padding-bottom: 5px;
-
-  @media (max-width: 500px) {
-    ${(props) => props.onlyWeb && "display: none"}
-  }
+const EditButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 `;
 
-export const Td = styled.td`
-  padding-top: 15px;
-  text-align: ${(props) => (props.alignCenter ? "center" : "start")};
-  width: ${(props) => (props.width ? props.width : "auto")};
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Para centralizar verticalmente */
+  margin-top: 15px;
+  margin-left: 30px;
+  margin-bottom: 20px;
+`;
 
-  @media (max-width: 500px) {
-    ${(props) => props.onlyWeb && "display: none"}
-  }
+const PreviousButton = styled.div`
+  margin-right: 30px; /* Adiciona margem à direita do botão "Anterior" */
 `;
 
 const Grid = ({ users, setUsers, setOnEdit }) => {
-    debugger
-    const handleEdit = (item) => {
-      setOnEdit(item);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pageNumber, setPageNumber] = useState(0);
+  const usersPerPage = 5;
+  const pagesVisited = pageNumber * usersPerPage;
+
+  const displayUsers = users
+    .slice(pagesVisited, pagesVisited + usersPerPage)
+    .map((item, i) => (
+      <tr key={i}>
+        <td>{i + 1}</td>
+        <td>{item.NOME}</td>
+        <td>{item.IDADE}</td>
+        <td>{item.NUMERO}</td>
+        <td>
+          <FaEdit onClick={() => handleEdit(item)} />
+          <FaTrash onClick={() => handleDelete(item.ID)} />
+        </td>
+      </tr>
+    ));
+
+  const pageCount = Math.ceil(users.length / usersPerPage);
+
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        let url = "http://localhost:8840/";
+        if (searchTerm.trim() !== "") {
+          url = `http://localhost:8840/search?q=${searchTerm}`;
+        }
+        const response = await axios.get(url);
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      }
     };
 
+    fetchUsers();
+  }, [searchTerm, setUsers]);
 
-    const handleDelete = async (id) => {
-        
-        await axios
-          .delete("http://localhost:8840/" + id)
-          .then(({ data }) => {
-            const newArray = users.filter((user) => user.ID !== id);
-            setUsers(newArray);
-            toast.success(data);
-          })
-          .catch(({ data }) => toast.error(data));
-    
-        setOnEdit(null);
-    };
-    
- 
+  const handleDelete = async (ID) => {
+    try {
+      await axios.delete("http://localhost:8840/" + ID);
+      const newArray = users.filter((user) => user.ID !== ID);
+      setUsers(newArray);
+      toast.success("Contato excluído com sucesso.");
+    } catch (error) {
+      console.error("Erro ao excluir contato:", error);
+      toast.error("Erro ao excluir contato.");
+    }
+  };
+
+  const handleEdit = (ID) => {
+    // Define o contato em edição
+    setOnEdit(ID);
+  };
+
   return (
-    <Table>
-      <Thead>
-        <Tr>
-          <Th>Nome</Th>
-          <Th>Idade</Th>
-          <Th>Numeros</Th>
-          <Th></Th>
-          <Th></Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {users.map((item, i) => (
-          <Tr key={i}>
-            
-            <Td width="30%">{item.NOME}</Td>
-            <Td width="30%">{item.IDADE}</Td>
-            <Td width="30%">{item.NUMERO}</Td>
-            <Td  width="5%">
-            <FaEdit onClick={() => handleEdit(item)} />
-            </Td>
-            <Td  width="5%">
-            <FaTrash onClick={() => handleDelete(item.ID)} />
-            </Td>
+    <div>
+      <InputArea>
+        <Input
+          id="busca"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: "200px" }}
+          placeholder="Digite sua busca aqui"
+        />
+      </InputArea>
 
-          </Tr>
-        ))}
-      </Tbody>
-    </Table>
+      <table className="table" style={{ width: "80vw", margin: "0 auto", height: "25vw", marginTop: "15px", color: "green" }}>
+        <thead className="table table-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Idade</th>
+            <th scope="col">Telefone</th>
+            <th scope="col">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {displayUsers}
+        </tbody>
+      </table>
+
+      <PaginationContainer>
+        <PreviousButton>
+          <ReactPaginate
+            previousLabel={"Anterior"}
+            nextLabel={"Próximo"}
+            pageCount={pageCount}
+            onPageChange={changePage}
+            containerClassName={"pagination"}
+            previousLinkClassName={"pagination__link"}
+            nextLinkClassName={"pagination__link"}
+            disabledClassName={"pagination__link--disabled"}
+            activeClassName={"pagination__link--active"}
+          />
+        </PreviousButton>
+      </PaginationContainer>
+    </div>
   );
 };
 

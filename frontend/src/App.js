@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const Container = styled.div`
   width: 100%;
@@ -23,6 +25,7 @@ const Title = styled.h2``;
 function App() {
   const [users, setUsers] = useState([]);
   const [onEdit, setOnEdit] = useState(null);
+  
 
   const getUsers = async () => {
     try {

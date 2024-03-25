@@ -1,4 +1,23 @@
+import fs from 'fs'; // Importando o módulo fs para manipulação de arquivos
+
 import { db } from "../db.js";
+
+// Função para registrar o log de exclusões
+function logContatoExcluido(nomeContato, dataHoraExclusao) {
+    const logMessage = `[${dataHoraExclusao}] Contato "${nomeContato}" excluído.\n`;
+
+    // Nome do arquivo de log
+    const logFileName = 'log_contatos.txt';
+
+    // Adiciona a entrada de log ao arquivo
+    fs.appendFile(logFileName, logMessage, (err) => {
+        if (err) {
+            console.error('Erro ao gravar no arquivo de log:', err);
+        } else {
+            console.log('Registro de log adicionado com sucesso.');
+        }
+    });
+}
 
 export const getUsers = (_, res) => {
     const q = "SELECT c.ID, c.NOME, c.IDADE, t.NUMERO FROM contato c LEFT JOIN telefone t ON c.ID = t.IDCONTATO";
@@ -14,116 +33,124 @@ export const getUsers = (_, res) => {
 };
 
 export const addUser = (req, res) => {
-    debugger;
-    const q = "INSERT INTO contato(`NOME`, `IDADE`) VALUES(?, ?)";
-  
-    const values = [
-        req.body.NOME,
-        req.body.IDADE,
-        
-    ];
-  
+    const q = "INSERT INTO contato (`NOME`, `IDADE`) VALUES (?, ?)";
+    const values = [req.body.NOME, req.body.IDADE];
+
     db.query(q, values, (err, result) => {
         if (err) {
             console.error("Erro ao adicionar usuário:", err);
             return res.status(500).json("Erro interno do servidor.");
         }
 
-        // Adiciona telefone se estiver presente nos dados recebidos
-        if (req.body.telefone) {
-            const telefone = req.body.telefone;
-            addTelefone(result.insertId, telefone, res);
+        if (req.body.NUMERO) {
+            const qTelefone = "INSERT INTO telefone (`IDCONTATO`, `NUMERO`) VALUES (?, ?)";
+            const valuesTelefone = [result.insertId, req.body.NUMERO];
+
+            db.query(qTelefone, valuesTelefone, (err) => {
+                if (err) {
+                    console.error("Erro ao adicionar número de telefone:", err);
+                    return res.status(500).json("Erro interno do servidor.");
+                }
+
+                return res.status(200).json("Usuário criado com sucesso.");
+            });
         } else {
             return res.status(200).json("Usuário criado com sucesso.");
         }
     });
 };
 
-const addTelefone = (idContato, numero, res) => {
-    const q = "INSERT INTO telefone(`IDCONTATO`, `NUMERO`) VALUES(?, ?)";
-
-    const values = [
-        idContato,
-        numero,
-    ];
-
-    db.query(q, values, (err) => {
-        if (err) {
-            console.error("Erro ao adicionar telefone:", err);
-            return res.status(500).json("Erro interno do servidor.");
-        }
-
-        return res.status(200).json("Usuário criado com sucesso.");
-    });
-};
-
 export const updateUser = (req, res) => {
-    const q = "UPDATE contato SET `NOME` = ?, `IDADE` = ? WHERE `ID` = ?";
-  
-    const values = [
-        req.body.NOME,
-        req.body.IDADE,
-        req.params.ID,
-    ];
+    const idContato = req.params.ID;
+    const { NOME, IDADE, NUMERO } = req.body;
+
+    // Query para atualizar o contato
+    const q = "UPDATE contato SET NOME = ?, IDADE = ? WHERE ID = ?";
+    const values = [NOME, IDADE, idContato];
 
     db.query(q, values, (err, result) => {
         if (err) {
-            console.error("Erro ao atualizar usuário:", err);
+            console.error("Erro ao atualizar contato:", err);
             return res.status(500).json("Erro interno do servidor.");
         }
-        
-        // Atualiza telefone se estiver presente nos dados recebidos
-        if (req.body.NUMERO) {
-            const numero = req.body.NUMERO;
-            updateTelefone(req.params.ID, numero, res);
+
+        // Se houver um número de telefone fornecido, atualize-o também
+        if (NUMERO) {
+            const qTelefone = "UPDATE telefone SET NUMERO = ? WHERE IDCONTATO = ?";
+            const valuesTelefone = [NUMERO, idContato];
+
+            db.query(qTelefone, valuesTelefone, (err) => {
+                if (err) {
+                    console.error("Erro ao atualizar número de telefone:", err);
+                    return res.status(500).json("Erro interno do servidor.");
+                }
+
+                // Chame a função para registrar o log de edição
+                const dataHoraEdicao = new Date().toLocaleString();
+                logContatoEditado(idContato, dataHoraEdicao);
+
+                return res.status(200).json("Contato atualizado com sucesso.");
+            });
         } else {
-            return res.status(200).json("Usuário atualizado com sucesso.");
+            // Se não houver número de telefone fornecido, retorne uma mensagem de sucesso
+            // e chame a função para registrar o log de edição
+            const dataHoraEdicao = new Date().toLocaleString();
+            logContatoEditado(idContato, dataHoraEdicao);
+            return res.status(200).json("Contato atualizado com sucesso.");
         }
     });
 };
 
 
-const updateTelefone = (idContato, numero, res) => {
-    const q = "UPDATE telefone SET `NUMERO` = ? WHERE `IDCONTATO` = ?";
 
-    const values = [
-        numero,
-        idContato,
-    ];
 
-    db.query(q, values, (err) => {
-        if (err) {
-            console.error("Erro ao atualizar telefone:", err);
-            return res.status(500).json("Erro interno do servidor.");
-        }
 
-        return res.status(200).json("Usuário atualizado com sucesso.");
-    });
-};
+
+
 
 export const deleteUser = (req, res) => {
-    const q = "DELETE FROM contato WHERE `id` = ?";
-  
-    db.query(q, [req.params.ID], (err) => {
+    const contatoQuery = "DELETE FROM contato WHERE `ID` = ?";
+    const telefoneQuery = "DELETE FROM telefone WHERE `IDCONTATO` = ?";
+    const idContato = req.params.ID;
+
+    db.query(telefoneQuery, [idContato], (err, result) => {
         if (err) {
-            console.error("Erro ao deletar usuário:", err);
-            return res.status(500).json("Erro interno do servidor.");
+            console.error("Erro ao deletar telefones:", err);
+            return res.status(500).json("Erro interno do servidor ao excluir telefones.");
         }
 
-        // Deleta telefone associado ao contato
-        deleteTelefone(req.params.ID, res);
+        db.query(contatoQuery, [idContato], (err, result) => {
+            if (err) {
+                console.error("Erro ao deletar contato:", err);
+                return res.status(500).json("Erro interno do servidor ao excluir contato.");
+            }
+
+            // Chama a função para registrar o log de exclusão
+            const dataHoraExclusao = new Date().toLocaleString();
+            logContatoExcluido(`Contato com ID ${idContato} foi excluído`, dataHoraExclusao);
+
+            return res.status(200).json("Contato e telefones associados excluídos com sucesso.");
+        });
     });
 };
 
-const deleteTelefone = (idContato, res) => {
-    const q = "DELETE FROM telefone WHERE `IDCONTATO` = ?";
-  
-    db.query(q, [idContato], (err) => {
+export const searchUsers = (req, res) => {
+    const searchTerm = req.query.q; // Obtém o termo de busca da query da URL
+    const q = `
+        SELECT c.ID, c.NOME, c.IDADE, t.NUMERO 
+        FROM contato c 
+        LEFT JOIN telefone t ON c.ID = t.IDCONTATO
+        WHERE c.NOME LIKE ? OR t.NUMERO LIKE ?
+    `;
+    const values = [`%${searchTerm}%`, `%${searchTerm}%`];
+
+    db.query(q, values, (err, data) => {
         if (err) {
-            console.error("Erro ao deletar telefone:", err);
+            console.error("Erro ao buscar usuários:", err);
             return res.status(500).json("Erro interno do servidor.");
         }
 
-        return res.status(200).json("Usuário deletado com sucesso.");
+        return res.status(200).json(data);
     });
 };
+
