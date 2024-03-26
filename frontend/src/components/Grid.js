@@ -40,6 +40,15 @@ const PreviousButton = styled.div`
   margin-right: 30px; /* Adiciona margem à direita do botão "Anterior" */
 `;
 
+const EditIcon = styled(FaEdit)`
+  margin-right: 50px; 
+`;
+
+const DeleteIcon = styled(FaTrash)`
+  margin-right: 50px; 
+  gap: 20px;
+`;
+
 const Grid = ({ users, setUsers, setOnEdit }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
@@ -55,8 +64,8 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
         <td>{item.IDADE}</td>
         <td>{item.NUMERO}</td>
         <td>
-          <FaEdit onClick={() => handleEdit(item)} />
-          <FaTrash onClick={() => handleDelete(item.ID)} />
+          <EditIcon onClick={() => handleEdit(item)} />
+          <DeleteIcon onClick={() => handleDelete(item.ID)} />
         </td>
       </tr>
     ));
