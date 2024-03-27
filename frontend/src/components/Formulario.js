@@ -57,23 +57,23 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
   const ref = useRef();
   const [numero, setNumero] = useState("");
 
-  useEffect(() => {
-    if (onEdit) {
-      const user = ref.current;
-
-      user.NOME.value = onEdit.NOME;
-      user.IDADE.value = onEdit.IDADE;
-      user.NUMERO.value = onEdit.NUMERO;
-    }
-  }, [onEdit]);
+  const handleChange = (e) => {
+    setNumero(e.target.value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const user = ref.current;
-     
-    if(user.NOME.value === ""||user.NUMERO.value === "" || user.IDADE.value === ""){
-      toast.error("preencha todos os campos.");
+
+    // Verificar se o número de telefone tem pelo menos 11 dígitos
+    if (numero.replace(/\D/g, '').length < 11) {
+      toast.error("O número de telefone incompleto!.");
+      return;
+    }
+
+    if(user.NOME.value === "" || user.IDADE.value === ""){
+      toast.error("Preencha todos os campos.");
       return;
     }
 
@@ -101,11 +101,18 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
     user.NOME.value = "";
     user.IDADE.value = "";
     user.NUMERO.value = "";
+    setNumero(""); // Limpar o valor do número de telefone após o envio do formulário
   };
 
-  const handleChange = (e) => {
-    setNumero(e.target.value);
-  };
+  useEffect(() => {
+    if (onEdit) {
+      const user = ref.current;
+
+      user.NOME.value = onEdit.NOME;
+      user.IDADE.value = onEdit.IDADE;
+      setNumero(onEdit.NUMERO); // Definir o valor do número de telefone
+    }
+  }, [onEdit]);
 
   return (
     <>
@@ -123,10 +130,10 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
           <InputMaskStyled
             mask="(99) 99999-9999"
             value={numero}
-            onChange={handleChange}  name="NUMERO"
+            onChange={handleChange}
+            name="NUMERO"
           />
         </InputArea>
-        
         <Button type="submit">Salvar</Button>
       </FormContainer>
 
@@ -136,3 +143,4 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
 };
 
 export default Formulario;
+
