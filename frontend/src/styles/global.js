@@ -19,6 +19,13 @@ const Global = createGlobalStyle`
  table{
   background-color: #8a2be2;
  }
+
+ .pagination{
+  color: #C5EBAA;
+ 
+ }
+
+
 `;
 
 export default Global;
