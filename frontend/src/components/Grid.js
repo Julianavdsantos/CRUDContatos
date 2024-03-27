@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { FaTrash, FaEdit, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactPaginate from 'react-paginate';
@@ -11,7 +11,14 @@ const InputArea = styled.div`
   flex-direction: column;
 `;
 
+const EditIcon = styled(FaEdit)`
+  margin-right: 50px; 
+`;
 
+const DeleteIcon = styled(FaTrash)`
+  margin-right: 50px; 
+  gap: 20px;
+`;
 
 const Input = styled.input`
   width: 120px;
@@ -19,12 +26,6 @@ const Input = styled.input`
   border: 1px solid #bbb;
   border-radius: 5px;
   height: 40px;
-`;
-
-const EditButton = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
 `;
 
 const PaginationContainer = styled.div`
@@ -40,13 +41,8 @@ const PreviousButton = styled.div`
   margin-right: 30px; /* Adiciona margem à direita do botão "Anterior" */
 `;
 
-const EditIcon = styled(FaEdit)`
-  margin-right: 50px; 
-`;
-
-const DeleteIcon = styled(FaTrash)`
-  margin-right: 50px; 
-  gap: 20px;
+const NextButton = styled.div`
+  margin-left: 30px; /* Adiciona margem à esquerda do botão "Próximo" */
 `;
 
 const Grid = ({ users, setUsers, setOnEdit }) => {
@@ -55,11 +51,15 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
   const usersPerPage = 5;
   const pagesVisited = pageNumber * usersPerPage;
 
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
   const displayUsers = users
     .slice(pagesVisited, pagesVisited + usersPerPage)
     .map((item, i) => (
-      <tr key={i}>
-        <td>{i + 1}</td>
+      <tr key={i + pagesVisited}>
+        <td>{i + 1 + pagesVisited}</td>
         <td>{item.NOME}</td>
         <td>{item.IDADE}</td>
         <td>{item.NUMERO}</td>
@@ -71,10 +71,7 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
     ));
 
   const pageCount = Math.ceil(users.length / usersPerPage);
-
-  const changePage = ({ selected }) => {
-    setPageNumber(selected);
-  };
+  const paginationInfo = `Página ${pageNumber + 1} de ${pageCount}`;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -136,24 +133,32 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
           {displayUsers}
         </tbody>
       </table>
+    
+      
+<PaginationContainer>
+  <PreviousButton>
+    <ReactPaginate
+      previousLabel={<FaChevronLeft />}
+      pageCount={pageCount}
+      nextLabel={<FaChevronRight />}
+      
+      onPageChange={changePage}
+      containerClassName={"pagination"}
+      previousLinkClassName={"pagination__link"}
+      nextLinkClassName={"pagination__link"}
+      disabledClassName={"pagination__link--disabled"}
+      activeClassName={"pagination__link--active"}
+      pageRangeDisplayed={0} 
+    />
+  </PreviousButton>
+  <div>{paginationInfo}</div>
+  <NextButton />
+</PaginationContainer>
 
-      <PaginationContainer>
-        <PreviousButton>
-          <ReactPaginate
-            previousLabel={"Anterior"}
-            nextLabel={"Próximo"}
-            pageCount={pageCount}
-            onPageChange={changePage}
-            containerClassName={"pagination"}
-            previousLinkClassName={"pagination__link"}
-            nextLinkClassName={"pagination__link"}
-            disabledClassName={"pagination__link--disabled"}
-            activeClassName={"pagination__link--active"}
-          />
-        </PreviousButton>
-      </PaginationContainer>
+
     </div>
   );
 };
 
 export default Grid;
+
