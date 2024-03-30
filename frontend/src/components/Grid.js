@@ -134,7 +134,7 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
             <th scope="col">Nome</th>
             <th scope="col">Idade</th>
             <th scope="col">Telefone</th>
-            <th scope="col">outros</th>
+            
             <th scope="col">Ações</th>
           </tr>
         </thead>
