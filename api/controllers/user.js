@@ -1,15 +1,15 @@
-import fs from 'fs'; // Importando o módulo fs para manipulação de arquivos
+import fs from 'fs'; 
+
 
 import { db } from "../db.js";
 
-// Função para registrar o log de exclusões
+
 function logContatoExcluido(nomeContato, dataHoraExclusao) {
     const logMessage = `[${dataHoraExclusao}] Contato "${nomeContato}" excluído.\n`;
 
-    // Nome do arquivo de log
+   
     const logFileName = 'log_contatos.txt';
 
-    // Adiciona a entrada de log ao arquivo
     fs.appendFile(logFileName, logMessage, (err) => {
         if (err) {
             console.error('Erro ao gravar no arquivo de log:', err);
@@ -42,23 +42,44 @@ export const addUser = (req, res) => {
             return res.status(500).json("Erro interno do servidor.");
         }
 
-        if (req.body.NUMERO) {
+        if (req.body.NUMERO && req.body.NUMERO.length > 0) {
+            const NUMERO = req.body.NUMERO;
             const qTelefone = "INSERT INTO telefone (`IDCONTATO`, `NUMERO`) VALUES (?, ?)";
-            const valuesTelefone = [result.insertId, req.body.NUMERO];
-
-            db.query(qTelefone, valuesTelefone, (err) => {
-                if (err) {
-                    console.error("Erro ao adicionar número de telefone:", err);
-                    return res.status(500).json("Erro interno do servidor.");
-                }
-
-                return res.status(200).json("Usuário criado com sucesso.");
+            console.log(NUMERO)
+            // Mapear todas as consultas em Promessas
+            const promises = NUMERO.map(numero => {
+                return new Promise((resolve, reject) => {
+                    const valuesTelefone = [result.insertId, numero];
+                    
+                    db.query(qTelefone, valuesTelefone, (err) => {
+                        if (err) {
+                            console.error("Erro ao adicionar número de telefone:", err);
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
             });
+
+            // Executar todas as consultas em paralelo
+            Promise.all(promises)
+                .then(() => {
+                    return res.status(200).json("Usuário criado com sucesso.");
+                })
+                .catch(err => {
+                    return res.status(500).json("Erro interno do servidor.");
+                });
         } else {
             return res.status(200).json("Usuário criado com sucesso.");
         }
     });
 };
+
+
+
+
+
 
 export const updateUser = (req, res) => {
     const idContato = req.params.ID;
@@ -153,4 +174,3 @@ export const searchUsers = (req, res) => {
         return res.status(200).json(data);
     });
 };
-

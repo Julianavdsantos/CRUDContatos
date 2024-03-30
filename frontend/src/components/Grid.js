@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { FaTrash, FaEdit, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactPaginate from 'react-paginate';
@@ -11,7 +11,14 @@ const InputArea = styled.div`
   flex-direction: column;
 `;
 
+const EditIcon = styled(FaEdit)`
+  margin-right: 50px; 
+`;
 
+const DeleteIcon = styled(FaTrash)`
+  margin-right: 50px; 
+  gap: 20px;
+`;
 
 const Input = styled.input`
   width: 120px;
@@ -19,12 +26,6 @@ const Input = styled.input`
   border: 1px solid #bbb;
   border-radius: 5px;
   height: 40px;
-`;
-
-const EditButton = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
 `;
 
 const PaginationContainer = styled.div`
@@ -40,33 +41,20 @@ const PreviousButton = styled.div`
   margin-right: 30px; /* Adiciona margem à direita do botão "Anterior" */
 `;
 
+const NextButton = styled.div`
+  margin-left: 30px; /* Adiciona margem à esquerda do botão "Próximo" */
+`;
+
 const Grid = ({ users, setUsers, setOnEdit }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageNumber, setPageNumber] = useState(0);
   const usersPerPage = 5;
   const pagesVisited = pageNumber * usersPerPage;
 
-  const displayUsers = users
-    .slice(pagesVisited, pagesVisited + usersPerPage)
-    .map((item, i) => (
-      <tr key={i}>
-        <td>{i + 1}</td>
-        <td>{item.NOME}</td>
-        <td>{item.IDADE}</td>
-        <td>{item.NUMERO}</td>
-        <td>
-          <FaEdit onClick={() => handleEdit(item)} />
-          <FaTrash onClick={() => handleDelete(item.ID)} />
-        </td>
-      </tr>
-    ));
-
-  const pageCount = Math.ceil(users.length / usersPerPage);
-
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
-
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -101,6 +89,10 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
     setOnEdit(ID);
   };
 
+  const displayUsers = users.slice(pagesVisited, pagesVisited + usersPerPage);
+  const pageCount = Math.ceil(users.length / usersPerPage);
+  const paginationInfo = `Página ${pageNumber + 1} de ${pageCount}`;
+
   return (
     <div>
       <InputArea>
@@ -120,28 +112,50 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
             <th scope="col">Nome</th>
             <th scope="col">Idade</th>
             <th scope="col">Telefone</th>
+            <th scope="col">outros</th>
             <th scope="col">Ações</th>
           </tr>
         </thead>
-        <tbody>
-          {displayUsers}
-        </tbody>
-      </table>
+    <tbody>
+  {displayUsers.map((user, index) => {
+    console.log(user); // Movido para dentro do corpo da função de mapeamento
+    return (
+      <tr key={index}>
+        <td>{index + 1}</td>
+        <td>{user.NOME}</td>
+        <td>{user.IDADE}</td>
+        <td>{user.NUMERO}</td>
+        
+       
+        <td>
+          <EditIcon onClick={() => handleEdit(user.ID)} />
+          <DeleteIcon onClick={() => handleDelete(user.ID)} />
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
 
+      </table>
+    
+      
       <PaginationContainer>
         <PreviousButton>
           <ReactPaginate
-            previousLabel={"Anterior"}
-            nextLabel={"Próximo"}
+            previousLabel={<FaChevronLeft />}
             pageCount={pageCount}
+            nextLabel={<FaChevronRight />}
             onPageChange={changePage}
             containerClassName={"pagination"}
             previousLinkClassName={"pagination__link"}
             nextLinkClassName={"pagination__link"}
             disabledClassName={"pagination__link--disabled"}
             activeClassName={"pagination__link--active"}
+            pageRangeDisplayed={0} 
           />
         </PreviousButton>
+        <div>{paginationInfo}</div>
+        <NextButton />
       </PaginationContainer>
     </div>
   );

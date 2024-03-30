@@ -55,34 +55,39 @@ const Button = styled.button`
 
 const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
   const ref = useRef();
-  const [numero, setNumero] = useState("");
+  const [NUMERO, setNumeros] = useState([]);
 
-  useEffect(() => {
-    if (onEdit) {
-      const user = ref.current;
-
-      user.NOME.value = onEdit.NOME;
-      user.IDADE.value = onEdit.IDADE;
-      user.NUMERO.value = onEdit.NUMERO;
-    }
-  }, [onEdit]);
+  const handleChange = (e, index) => {
+    const { value } = e.target;
+    const updatedNumeros = [...NUMERO];
+    updatedNumeros[index] = value;
+    setNumeros(updatedNumeros);
+  };
+  const addPhoneNumberField = () => {
+    setNumeros([...NUMERO, ""]); // Adicionar um novo campo de número de telefone vazio
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const user = ref.current;
-     
-    if(user.NOME.value === ""||user.NUMERO.value === "" || user.IDADE.value === ""){
-      toast.error("preencha todos os campos.");
+    // Verificar se o número de telefone tem pelo menos 11 dígitos
+    if (NUMERO.some(NUMERO => NUMERO.replace(/\D/g, '').length < 11)) {
+      toast.error("O número de telefone está incompleto.");
+      return;
+    }
+
+    if(user.NOME.value === "" || user.IDADE.value === ""){
+      toast.error("Preencha todos os campos.");
       return;
     }
 
     const formData = {
-      NOME: user["NOME"].value,
-      IDADE: user["IDADE"].value,
-      NUMERO: user["NUMERO"].value,
+      NOME: user.NOME.value,
+      IDADE: user.IDADE.value,
+      NUMERO: NUMERO,
     };
-
+   console.log(NUMERO)
     if (onEdit) {
       await axios
         .put(`http://localhost:8840/${onEdit.ID}`, formData)
@@ -100,12 +105,18 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
 
     user.NOME.value = "";
     user.IDADE.value = "";
-    user.NUMERO.value = "";
+    setNumeros([]); // Limpar o valor dos números de telefone após o envio do formulário
   };
 
-  const handleChange = (e) => {
-    setNumero(e.target.value);
-  };
+  useEffect(() => {
+    if (onEdit) {
+      const user = ref.current;
+
+      user.NOME.value = onEdit.NOME;
+      user.IDADE.value = onEdit.IDADE;
+      setNumeros(onEdit.NUMERO); // Definir o valor dos números de telefone
+    }
+  }, [onEdit]);
 
   return (
     <>
@@ -119,17 +130,20 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
           <Input name="IDADE" type="number" />
         </InputArea>
         <InputArea>
-          <Label>Telefone</Label>
-          <InputMaskStyled
-            mask="(99) 99999-9999"
-            value={numero}
-            onChange={handleChange}  name="NUMERO"
-          />
+          <Label>Telefones</Label>
+          {NUMERO.map((numero, index) => (
+            <InputMaskStyled
+              key={index}
+              mask="(99) 99999-9999"
+              value={numero}
+              onChange={(e) => handleChange(e, index)}
+              name={`NUMERO[${index}]`}
+            />
+          ))}
+          <Button type="button" onClick={addPhoneNumberField}>Adicionar Telefone</Button>
         </InputArea>
-        
         <Button type="submit">Salvar</Button>
       </FormContainer>
-
       <ToastContainer />
     </>
   );
