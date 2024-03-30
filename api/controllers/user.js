@@ -1,9 +1,8 @@
-import fs from 'fs'; 
-
+import fs from 'fs'; // Importando o módulo fs para manipulação de arquivos
 
 import { db } from "../db.js";
 
-
+// Função para registrar o log de exclusões
 function logContatoExcluido(nomeContato, dataHoraExclusao) {
     const logMessage = `[${dataHoraExclusao}] Contato "${nomeContato}" excluído.\n`;
 
@@ -42,41 +41,38 @@ export const addUser = (req, res) => {
             return res.status(500).json("Erro interno do servidor.");
         }
 
-        if (req.body.NUMERO && req.body.NUMERO.length > 0) {
-            const NUMERO = req.body.NUMERO;
+        if (req.body.NUMERO) {
             const qTelefone = "INSERT INTO telefone (`IDCONTATO`, `NUMERO`) VALUES (?, ?)";
-            console.log(NUMERO)
-            // Mapear todas as consultas em Promessas
-            const promises = NUMERO.map(numero => {
-                return new Promise((resolve, reject) => {
-                    const valuesTelefone = [result.insertId, numero];
-                    
-                    db.query(qTelefone, valuesTelefone, (err) => {
-                        if (err) {
-                            console.error("Erro ao adicionar número de telefone:", err);
-                            reject(err);
-                        } else {
-                            resolve();
-                        }
-                    });
-                });
-            });
+            const valuesTelefone = [result.insertId, req.body.NUMERO];
 
-            // Executar todas as consultas em paralelo
-            Promise.all(promises)
-                .then(() => {
-                    return res.status(200).json("Usuário criado com sucesso.");
-                })
-                .catch(err => {
+            db.query(qTelefone, valuesTelefone, (err) => {
+                if (err) {
+                    console.error("Erro ao adicionar número de telefone:", err);
                     return res.status(500).json("Erro interno do servidor.");
-                });
+                }
+
+                // Verificar se há um segundo número de telefone e salvá-lo, se existir
+                if (req.body.NUMERO2) {
+                    const qTelefone2 = "INSERT INTO telefone (`IDCONTATO`, `NUMERO`) VALUES (?, ?)";
+                    const valuesTelefone2 = [result.insertId, req.body.NUMERO2];
+
+                    db.query(qTelefone2, valuesTelefone2, (err) => {
+                        if (err) {
+                            console.error("Erro ao adicionar segundo número de telefone:", err);
+                            return res.status(500).json("Erro interno do servidor.");
+                        }
+
+                        return res.status(200).json("Usuário criado com sucesso.");
+                    });
+                } else {
+                    return res.status(200).json("Usuário criado com sucesso.");
+                }
+            });
         } else {
             return res.status(200).json("Usuário criado com sucesso.");
         }
     });
 };
-
-
 
 
 
