@@ -54,7 +54,29 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
+<<<<<<< HEAD
   
+=======
+
+  const displayUsers = users
+    .slice(pagesVisited, pagesVisited + usersPerPage)
+    .map((item, i) => (
+      <tr key={i + pagesVisited}>
+        <td>{i + 1 + pagesVisited}</td>
+        <td>{item.NOME}</td>
+        <td>{item.IDADE}</td>
+        <td>{item.NUMERO}</td>
+        <td>
+          <EditIcon onClick={() => handleEdit(item)} />
+          <DeleteIcon onClick={() => handleDelete(item.ID)} />
+        </td>
+      </tr>
+    ));
+
+  const pageCount = Math.ceil(users.length / usersPerPage);
+  const paginationInfo = `Página ${pageNumber + 1} de ${pageCount}`;
+
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -116,6 +138,7 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
             <th scope="col">Ações</th>
           </tr>
         </thead>
+<<<<<<< HEAD
     <tbody>
   {displayUsers.map((user, index) => {
     console.log(user); // Movido para dentro do corpo da função de mapeamento
@@ -157,8 +180,38 @@ const Grid = ({ users, setUsers, setOnEdit }) => {
         <div>{paginationInfo}</div>
         <NextButton />
       </PaginationContainer>
+=======
+        <tbody>
+          {displayUsers}
+        </tbody>
+      </table>
+    
+      
+<PaginationContainer>
+  <PreviousButton>
+    <ReactPaginate
+      previousLabel={<FaChevronLeft />}
+      pageCount={pageCount}
+      nextLabel={<FaChevronRight />}
+      
+      onPageChange={changePage}
+      containerClassName={"pagination"}
+      previousLinkClassName={"pagination__link"}
+      nextLinkClassName={"pagination__link"}
+      disabledClassName={"pagination__link--disabled"}
+      activeClassName={"pagination__link--active"}
+      pageRangeDisplayed={0} 
+    />
+  </PreviousButton>
+  <div>{paginationInfo}</div>
+  <NextButton />
+</PaginationContainer>
+
+
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
     </div>
   );
 };
 
 export default Grid;
+

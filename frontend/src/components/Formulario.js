@@ -57,6 +57,7 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
   const ref = useRef();
   const [NUMERO, setNumeros] = useState([]);
 
+<<<<<<< HEAD
   const handleChange = (e, index) => {
     const { value } = e.target;
     const updatedNumeros = [...NUMERO];
@@ -66,14 +67,26 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
   const addPhoneNumberField = () => {
     setNumeros([...NUMERO, ""]); // Adicionar um novo campo de número de telefone vazio
   }
+=======
+  const handleChange = (e) => {
+    setNumero(e.target.value);
+  };
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const user = ref.current;
+<<<<<<< HEAD
     // Verificar se o número de telefone tem pelo menos 11 dígitos
     if (NUMERO.some(NUMERO => NUMERO.replace(/\D/g, '').length < 11)) {
       toast.error("O número de telefone está incompleto.");
+=======
+
+    // Verificar se o número de telefone tem pelo menos 11 dígitos
+    if (numero.replace(/\D/g, '').length < 11) {
+      toast.error("O número de telefone incompleto!.");
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
       return;
     }
 
@@ -105,7 +118,12 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
 
     user.NOME.value = "";
     user.IDADE.value = "";
+<<<<<<< HEAD
     setNumeros([]); // Limpar o valor dos números de telefone após o envio do formulário
+=======
+    user.NUMERO.value = "";
+    setNumero(""); // Limpar o valor do número de telefone após o envio do formulário
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
   };
 
   useEffect(() => {
@@ -114,7 +132,11 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
 
       user.NOME.value = onEdit.NOME;
       user.IDADE.value = onEdit.IDADE;
+<<<<<<< HEAD
       setNumeros(onEdit.NUMERO); // Definir o valor dos números de telefone
+=======
+      setNumero(onEdit.NUMERO); // Definir o valor do número de telefone
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
     }
   }, [onEdit]);
 
@@ -130,6 +152,7 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
           <Input name="IDADE" type="number" />
         </InputArea>
         <InputArea>
+<<<<<<< HEAD
           <Label>Telefones</Label>
           {NUMERO.map((numero, index) => (
             <InputMaskStyled
@@ -141,6 +164,15 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
             />
           ))}
           <Button type="button" onClick={addPhoneNumberField}>Adicionar Telefone</Button>
+=======
+          <Label>Telefone</Label>
+          <InputMaskStyled
+            mask="(99) 99999-9999"
+            value={numero}
+            onChange={handleChange}
+            name="NUMERO"
+          />
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
         </InputArea>
         <Button type="submit">Salvar</Button>
       </FormContainer>
@@ -150,3 +182,4 @@ const Formulario = ({ getUsers, onEdit, setOnEdit }) => {
 };
 
 export default Formulario;
+

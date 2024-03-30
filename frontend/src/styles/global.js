@@ -26,7 +26,10 @@ const Global = createGlobalStyle`
  }
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 220d56c0fd0bd2cdab249bb3cc99d51ee96425c6
 `;
 
 export default Global;
