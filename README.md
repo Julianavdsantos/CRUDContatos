@@ -50,7 +50,5 @@ Para utilizar o Museu Projeto, siga os passos abaixo:
 
 5. **Uso da Aplicação**: Após iniciar o backend e o frontend, você poderá acessar a aplicação em seu navegador. Interaja com a interface de usuário para visualizar, adicionar, atualizar, excluir e pesquisar contatos conforme necessário.
 
-## Conclusão
 
-O Museu Projeto oferece uma solução abrangente e eficiente para gerenciamento de contatos, fornecendo uma interface amigável e funcionalidades essenciais para organização e manipulação de informações pessoais. Experimente agora mesmo e simplifique sua vida organizando seus contatos de forma eficaz!
 
