@@ -3,7 +3,7 @@
 
 # Museu Projeto - Sistema de Gerenciamento de Contatos
 
-O Museu Projeto é um sistema de gerenciamento de contatos desenvolvido para auxiliar na organização e manipulação de informações de contatos pessoais. Este projeto utiliza tecnologias como Node.js, Express.js, MySQL e React.js para fornecer uma experiência completa de CRUD (Create, Read, Update, Delete) de contatos.
+Este Projeto é um sistema de gerenciamento de contatos desenvolvido para auxiliar na organização e manipulação de informações de contatos pessoais. Este projeto utiliza tecnologias como Node.js, Express.js, MySQL e React.js para fornecer uma experiência completa de CRUD (Create, Read, Update, Delete) de contatos.
 
 ## Funcionalidades Principais
 
